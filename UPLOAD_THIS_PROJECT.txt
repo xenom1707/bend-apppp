@@ -1,0 +1,9 @@
+מוכן ל-GitHub.
+
+יש להעלות ל-Repository את כל הקבצים והתיקיות שנמצאים כאן.
+חשוב: התיקייה .github מכילה את תהליך הבנייה האוטומטי.
+
+לאחר ההעלאה:
+GitHub > Actions > Build Android APK > Run workflow
+בסיום הורד את Artifact בשם BendCalculator-APK.
+בתוכו יהיה BendCalculator.apk להתקנה באנדרואיד.
