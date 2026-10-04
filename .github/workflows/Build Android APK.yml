@@ -24,16 +24,25 @@ jobs:
         with:
           gradle-version: '8.9'
 
-      - name: Show Android SDK
+      - name: Find sdkmanager
+        id: androidsdk
+        shell: bash
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          sdkmanager --version
-          sdkmanager --list_installed
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager 2>/dev/null | sort -V | tail -n 1)
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager was not found under $ANDROID_HOME/cmdline-tools"
+            find "$ANDROID_HOME" -maxdepth 3 -type f -name sdkmanager -print || true
+            exit 1
+          fi
+          echo "Found sdkmanager: $SDKMANAGER"
+          echo "sdkmanager=$SDKMANAGER" >> "$GITHUB_OUTPUT"
 
       - name: Install required Android packages
+        shell: bash
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          SDKMANAGER="${{ steps.androidsdk.outputs.sdkmanager }}"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Build installable APK
         run: gradle :app:assembleDebug --stacktrace
